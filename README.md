@@ -95,4 +95,32 @@ No modules.
 | <a name="output_ssm_subnet_public_1b"></a> [ssm\_subnet\_public\_1b](#output\_ssm\_subnet\_public\_1b) | ID da subnet pública na zona de disponibilidade 1b. Disponível via AWS Systems Manager Parameter Store, permite a implementação de recursos com acesso público nesta zona específica. |
 | <a name="output_ssm_subnet_public_1c"></a> [ssm\_subnet\_public\_1c](#output\_ssm\_subnet\_public\_1c) | ID da subnet pública na zona de disponibilidade 1c, armazenado no AWS Systems Manager Parameter Store. Usado para configurar recursos que necessitam de acesso público nesta zona. |
 | <a name="output_ssm_vpc_id"></a> [ssm\_vpc\_id](#output\_ssm\_vpc\_id) | ID do VPC armazenado no AWS Systems Manager Parameter Store. Este ID é usado para identificar o VPC onde os recursos serão provisionados. |
+
+
+
+## Tipos de Subnet:
+**Pública:** possui uma rota direta para um internet gateway. Recursos em uma subnet
+pública pode acessar a internet. E podem ser acessados, desde que possuam ip
+público.
+
+Internet Gateway: é o componente que premit comunicação entre a VPC e a internet.
+fornece um destino nas tabelas de rotas da VPC para tráfego roteável pela Internet.
+Para a comunicação usando o IPv4, o gateway da Internet também executa a 
+conversão de endereços de rede (NAT).
+Para tornar a sub-rede pública, adicione uma rota à tabela de rotas da sua 
+sub-rede que direcione o tráfego vinculado à Internet para o Internet Gateway.
+
+Se a VPC não tem um Internet Gateway, os recursos da VPC não podem ser acessados
+da internet.( A não ser que o tráfego flua via Corporate Network e VPN/Direct 
+Connect )
+
+VPC >> Public Network >> Internet Gateway >> Route Table
+
+**Privada:** não tem uma rota direta para um internet gateway. Necessita de um 
+dispositivo NAT para acessar a internet.
+
+
+
 <!-- END_TF_DOCS -->
+
+
