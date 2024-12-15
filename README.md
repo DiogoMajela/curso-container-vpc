@@ -100,11 +100,11 @@ No modules.
 
 ## Tipos de Subnet:
 **Pública:** possui uma rota direta para um internet gateway. Recursos em uma subnet
-pública pode acessar a internet. E podem ser acessados, desde que possuam ip
+pública podem acessar a internet. E podem ser acessados, desde que possuam ip
 público.
 
-Internet Gateway: é o componente que premit comunicação entre a VPC e a internet.
-fornece um destino nas tabelas de rotas da VPC para tráfego roteável pela Internet.
+Internet Gateway: é o componente que permite comunicação entre a VPC e a internet.
+Isto é feito por meio de adição nas tabelas de rotas da VPC para tráfego roteável pela Internet (0.0.0.0).
 Para a comunicação usando o IPv4, o gateway da Internet também executa a 
 conversão de endereços de rede (NAT).
 Para tornar a sub-rede pública, adicione uma rota à tabela de rotas da sua 
@@ -120,6 +120,57 @@ VPC >> Public Network >> Internet Gateway >> Route Table
 dispositivo NAT para acessar a internet.
 
 
+
+## SSM Parameter
+O AWS Systems Manager Parameter Store oferece uma forma segura e eficiente de armazenar configurações e dados sensíveis em aplicações e infraestruturas na nuvem.
+Garante que informações críticas, como credenciais ou identificadores de recursos, sejam armazenadas de forma centralizada, criptografada e facilmente acessível quando necessário.
+Ex: Permite armazenar valores de configuração, como strings de conexão, chaves API e informações sensíveis.
+
+No contexto deste módulo, o Parameter Store foi utilizado para armazenar informações essenciais, como os IDs das subnets privadas e públicas. Com isso, outros módulos podem acessar essas informações sempre que precisarem utilizar o ID da VPC associada.
+
+Essa abordagem elimina a necessidade de hardcoding dessas informações no código, promovendo maior segurança, reusabilidade e facilidade de manutenção da infraestrutura, especialmente em ambientes colaborativos e de múltiplos serviços.
+
+Benefícios principais
+
+    Segurança: Integração com o AWS Key Management Service (KMS) para criptografar parâmetros sensíveis.
+    Organização: Suporte a hierarquias, facilitando o agrupamento de configurações por ambientes (por exemplo, /prod/, /dev/).
+    Auditoria: Logs de acesso detalhados via AWS CloudTrail.
+    Automação: Integração nativa com outras ferramentas AWS, como EC2 e Lambda.
+
+**Armazenando e Recuperando um Parâmetro Simples**
+Armazenando o parâmetro:
+```sh
+aws ssm put-parameter \
+  --name "/dev/db/connection-string" \
+  --value "jdbc:mysql://example.com:3306/mydb" \
+  --type "String" \
+  --overwrite
+```
+Recuperando o parâmetro:
+```sh
+aws ssm get-parameter \
+  --name "/dev/db/connection-string" \
+  --query "Parameter.Value" \
+  --output text
+```
+**Armazenando um Segredo com Criptografia**
+Armazenando o segredo:
+```sh
+aws ssm put-parameter \
+  --name "/prod/api/secret-key" \
+  --value "superSecretKey123" \
+  --type "SecureString" \
+  --key-id "alias/my-kms-key"
+```
+
+Recuperando o segredo (criptografado):
+```sh
+aws ssm get-parameter \
+  --name "/prod/api/secret-key" \
+  --with-decryption \
+  --query "Parameter.Value" \
+  --output text
+```
 
 <!-- END_TF_DOCS -->
 
